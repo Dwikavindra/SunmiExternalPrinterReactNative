@@ -141,11 +141,8 @@ function App(): JSX.Element {
           <Button
             title="Start Network Discovery"
             onPress={async () => {
-              const networkDiscovery = await startNetworkDiscovery(20000);
-              setListofBlDevices([]);
-              setShowFlatListBT(false);
-              setShowFlatListNetwork(true);
-              console.log(networkDiscovery);
+              const check = await startNetworkDiscovery(10000);
+              console.log(check);
             }}
           />
           <Button
