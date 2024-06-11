@@ -38,17 +38,9 @@ export const EscPosImageWithTCPConnectionRasterBitImageWrapper = async (
     return error;
   }
 };
-export const startNetworkDiscovery = async () => {
+export const startNetworkDiscovery = async (duration: number) => {
   try {
-    return await SunmiExternalPrinterReactNative.startDiscovery();
-  } catch (error) {
-    return error;
-  }
-};
-
-export const stopNetworkDiscovery = async () => {
-  try {
-    return await SunmiExternalPrinterReactNative.stopDiscovery();
+    return await SunmiExternalPrinterReactNative.startDiscovery(duration);
   } catch (error) {
     return error;
   }

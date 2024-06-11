@@ -25,9 +25,7 @@ import {
   printImageByBluetooth,
   scanBLDevice,
   startNetworkDiscovery,
-  stopNetworkDiscovery,
 } from 'sunmi-external-printer';
-import { DeviceEventEmitter } from 'react-native';
 import { useState } from 'react';
 import { convertHTMLtoBase64 } from '../../src';
 import type { printerDevice } from 'src/printerDevice';
@@ -41,7 +39,6 @@ function App(): JSX.Element {
   const [blDevices, setListofBlDevices] = useState<printerDevice[]>([]);
   const [showFlatListNetwork, setShowFlatListNetwork] = useState<boolean>(true);
   const [showFlatListBT, setShowFlatListBT] = useState<boolean>(false);
-  const check = 'check';
   const Item2 = ({ item, onPress, backgroundColor, textColor }: any) => (
     <TouchableOpacity
       onPress={onPress}
@@ -78,10 +75,7 @@ function App(): JSX.Element {
           setIpAddress(item.printerIPAddress);
           setPort(item.printerPort);
           setPrinterName(item.printerName);
-          const Print = await stopNetworkDiscovery();
-          DeviceEventEmitter.removeAllListeners();
           setListofDevices([]);
-          console.log(Print);
         }}
         backgroundColor={backgroundColor}
         textColor={'white'}
@@ -147,31 +141,11 @@ function App(): JSX.Element {
           <Button
             title="Start Network Discovery"
             onPress={async () => {
-              const networkDiscovery = await startNetworkDiscovery();
-              DeviceEventEmitter.addListener('OnPrinterFound', (event) => {
-                const device: ItemData = {
-                  printerName: event.printername,
-                  printerIPAddress: event.ip,
-                  printerPort: event.port,
-                };
-
-                setListofDevices([...devices, device]);
-              });
+              const networkDiscovery = await startNetworkDiscovery(20000);
               setListofBlDevices([]);
               setShowFlatListBT(false);
               setShowFlatListNetwork(true);
               console.log(networkDiscovery);
-            }}
-          />
-          <Button
-            title="Stop Discovery"
-            onPress={async () => {
-              const Print = await stopNetworkDiscovery();
-              DeviceEventEmitter.removeAllListeners();
-              setListofDevices([]);
-              setShowFlatListNetwork(false);
-              setShowFlatListBT(true);
-              console.log(Print);
             }}
           />
           <Button

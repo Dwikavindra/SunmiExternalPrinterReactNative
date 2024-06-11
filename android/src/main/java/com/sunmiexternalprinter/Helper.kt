@@ -13,6 +13,7 @@ import androidx.core.app.ActivityCompat
 import com.facebook.react.bridge.Arguments
 import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
+import com.sunmiexternalprinter.NSD.NSDDevice
 import java.util.SortedSet
 import java.util.regex.Pattern
 
@@ -121,6 +122,19 @@ class Helper {
         throw Exception("Bluetooth Device with the name or address ${address} Not Found")
 
       }
+    }
+
+    fun setNSDDevicesToWritableArray(nsdDevices:MutableList<NSDDevice>):WritableArray{
+      val results: WritableArray = Arguments.createArray()
+      var deviceMap: WritableMap = Arguments.createMap()
+      for(nsdDevice in nsdDevices){
+        deviceMap.putString("printername",nsdDevice.serviceName)
+        deviceMap.putString("ip",nsdDevice.host)
+        deviceMap.putString("port",nsdDevice.port)
+        results.pushMap(deviceMap)
+        deviceMap=Arguments.createMap()
+      }
+      return results
     }
 
   }

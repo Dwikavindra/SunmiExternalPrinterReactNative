@@ -25,6 +25,7 @@ import com.github.anastaciocintra.escpos.image.*
 import com.github.anastaciocintra.output.TcpIpOutputStream
 import com.izettle.html2bitmap.Html2Bitmap
 import com.izettle.html2bitmap.content.WebViewContent
+import com.sunmiexternalprinter.NSD.NSDDevice
 import java.io.ByteArrayOutputStream
 import java.net.InetAddress
 import java.util.Collections
@@ -46,6 +47,7 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
   private val bleScanResults:SortedSet<BluetoothDeviceComparable> = TreeSet()
   private val bleScanResultsClassChanged= mutableListOf<BluetoothDeviceComparable>()
   private val bleScanResultsDataClass= mutableListOf<BTDevice>()
+  private val nsdScanResuls=mutableListOf<NSDDevice>()
   var stream: BluetoothStream? = null
   private var receiverDisconnectedBluetoothDeviceReceiver:BroadcastReceiver=object : BroadcastReceiver() {
     @SuppressLint("MissingPermission")
@@ -92,14 +94,12 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
     override fun onServiceResolved(serviceInfo: NsdServiceInfo) {
 
       val port: Int = serviceInfo.port
-      val host: InetAddress = serviceInfo.host
+      val hostAddress: String? = serviceInfo.host.hostAddress
       val serviceName = serviceInfo.serviceName
-      val payload = Arguments.createMap().apply {
-        putString("Service Discovery", serviceName)
-        putString("ip", host.hostAddress)
-        putString("port", port.toString())
+      if(hostAddress!==null){
+        nsdScanResuls.add(NSDDevice(port.toString(),hostAddress,serviceName))
       }
-      sendEvent(reactContext, "OnPrinterFound", payload)
+
     }
   }
 
@@ -120,11 +120,11 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
       }
 
       override fun onDiscoveryStopped(p0: String?) {
-
+        Log.d("FromNSDStopped","stopped")
+        this@SunmiExternalPrinterReactNativeModule.promise?.resolve(Helper.setNSDDevicesToWritableArray(nsdScanResuls))
       }
 
       override fun onServiceFound(p0: NsdServiceInfo?) {
-        println("Found")
         nsdManager?.resolveService(p0, resolveListener)
 
 
@@ -286,8 +286,11 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
   }
 
   @ReactMethod
-  fun startDiscovery(promise: Promise) {
+  fun startDiscovery(promise: Promise,duration:Double) {
+    this.promise=promise
+
     try {
+
       nsdManager =
         reactApplicationContext.applicationContext.getSystemService(Context.NSD_SERVICE) as NsdManager
       nsdManager?.discoverServices(
@@ -295,7 +298,12 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
         NsdManager.PROTOCOL_DNS_SD,
         discoveryListener
       )
-      promise.resolve("Discovery Started")
+      Handler(Looper.getMainLooper()).postDelayed({
+        nsdManager?.stopServiceDiscovery(discoveryListener)
+      }, duration.toLong())
+
+
+
     } catch (e: Exception) {
       promise.reject("Error", e.toString())
     }
@@ -468,6 +476,7 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
         val escpos = EscPos(stream)
         val encodedBase64 = Base64.decode(base64Image, Base64.DEFAULT)
         val bitmap = BitmapFactory.decodeByteArray(encodedBase64, 0, encodedBase64.size)
+        // i dont know why there is -40 here
         val scaledBitmap =
           Bitmap.createScaledBitmap(bitmap, bitmap.width - 40, bitmap.height, true)
         val algorithm = BitonalOrderedDither()
