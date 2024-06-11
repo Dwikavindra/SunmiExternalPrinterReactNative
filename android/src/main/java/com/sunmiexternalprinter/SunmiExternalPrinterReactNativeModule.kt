@@ -286,7 +286,7 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
   }
 
   @ReactMethod
-  fun startDiscovery(promise: Promise,duration:Double) {
+  fun startDiscovery(duration:Double,promise: Promise) {
     this.promise=promise
 
     try {
