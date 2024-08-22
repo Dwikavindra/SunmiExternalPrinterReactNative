@@ -10,17 +10,18 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.net.Uri
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
 import android.os.Build
 import android.os.Handler
 import android.os.Looper
 import android.os.PowerManager
+import android.provider.Settings
 import android.util.Base64
 import android.util.Log
 import androidx.core.content.ContextCompat
 import com.facebook.react.bridge.Arguments
-import com.facebook.react.bridge.Callback
 import com.facebook.react.bridge.Promise
 import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContext
@@ -328,6 +329,17 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
     } else {
       promise.resolve(true)
     }
+  }
+  @SuppressLint("BatteryLife")
+  @ReactMethod
+  fun openBatteryOptimizationSettings(promise: Promise) {
+    val packageName = reactApplicationContext.packageName
+    val intent = Intent()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
+      intent.setData(Uri.parse("package:$packageName"));
+    };
+    reactApplicationContext.startActivity(intent)
   }
 
   @ReactMethod
