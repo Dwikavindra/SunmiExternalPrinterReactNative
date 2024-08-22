@@ -1,4 +1,5 @@
 package com.sunmiexternalprinter
+
 import android.annotation.SuppressLint
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
@@ -11,15 +12,29 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.nsd.NsdManager
 import android.net.nsd.NsdServiceInfo
+import android.os.Build
 import android.os.Handler
 import android.os.Looper
+import android.os.PowerManager
 import android.util.Base64
 import android.util.Log
 import androidx.core.content.ContextCompat
-import com.facebook.react.bridge.*
+import com.facebook.react.bridge.Arguments
+import com.facebook.react.bridge.Callback
+import com.facebook.react.bridge.Promise
+import com.facebook.react.bridge.ReactApplicationContext
+import com.facebook.react.bridge.ReactContext
+import com.facebook.react.bridge.ReactContextBaseJavaModule
+import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.github.anastaciocintra.escpos.EscPos
-import com.github.anastaciocintra.escpos.image.*
+import com.github.anastaciocintra.escpos.image.BitImageWrapper
+import com.github.anastaciocintra.escpos.image.BitonalOrderedDither
+import com.github.anastaciocintra.escpos.image.BitonalThreshold
+import com.github.anastaciocintra.escpos.image.EscPosImage
+import com.github.anastaciocintra.escpos.image.GraphicsImageWrapper
+import com.github.anastaciocintra.escpos.image.RasterBitImageWrapper
 import com.github.anastaciocintra.output.TcpIpOutputStream
 import com.izettle.html2bitmap.Html2Bitmap
 import com.izettle.html2bitmap.content.WebViewContent
@@ -302,6 +317,17 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
     }
 
 
+  }
+
+  @ReactMethod
+  fun isAppIgnoringBatteryOptimization(promise: Promise) {
+    val packageName = reactApplicationContext.packageName
+    val pm = reactApplicationContext.getSystemService(Context.POWER_SERVICE) as PowerManager
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      promise.resolve(pm.isIgnoringBatteryOptimizations(packageName))
+    } else {
+      promise.resolve(true)
+    }
   }
 
   @ReactMethod

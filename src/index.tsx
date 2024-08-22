@@ -150,3 +150,10 @@ export const openDrawerBluetooth = async (device: printerDevice) => {
     throw error;
   }
 };
+export const isAppIgnoringBatteryOptimization = async () => {
+  try {
+    return await SunmiExternalPrinterReactNative.isAppIgnoringBatteryOptimization()
+  } catch (error) {
+    throw error;
+  }
+};

@@ -22,6 +22,7 @@ import {
   EscPosImageWithTCPConnectionRasterBitImageWrapper,
   closePrinterSocket,
   getPairedDevices,
+  isAppIgnoringBatteryOptimization,
   openDrawer,
   printBLCut,
   printBLFeed,
@@ -193,6 +194,13 @@ function App(): JSX.Element {
             onPress={async () => {
               const drawer = await openDrawer(ipAddress, port);
               console.log(drawer);
+            }}
+          />
+          <Button
+            title="Is app Ignoring Battery Optimization"
+            onPress={async () => {
+              const result = await isAppIgnoringBatteryOptimization();
+              console.log(result);
             }}
           />
           <Button
