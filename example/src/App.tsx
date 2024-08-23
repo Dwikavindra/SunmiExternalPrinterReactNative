@@ -23,6 +23,7 @@ import {
   closePrinterSocket,
   getPairedDevices,
   isAppIgnoringBatteryOptimization,
+  openBatteryOptimizationSettings,
   openDrawer,
   printBLCut,
   printBLFeed,
@@ -200,6 +201,13 @@ function App(): JSX.Element {
             title="Is app Ignoring Battery Optimization"
             onPress={async () => {
               const result = await isAppIgnoringBatteryOptimization();
+              console.log(result);
+            }}
+          />
+          <Button
+            title="Open App Optimization Settings"
+            onPress={async () => {
+              const result = await openBatteryOptimizationSettings();
               console.log(result);
             }}
           />

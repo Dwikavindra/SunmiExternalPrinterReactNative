@@ -165,3 +165,17 @@ export const openBatteryOptimizationSettings = async () => {
     throw error;
   }
 };
+export const isServiceRunning = async () => {
+  try {
+    return await SunmiExternalPrinterReactNative.isServiceRunning();
+  } catch (error) {
+    throw error;
+  }
+};
+export const getListofServiceNames = async () => {
+  try {
+    return await SunmiExternalPrinterReactNative.getListofServiceNames();
+  } catch (error) {
+    throw error;
+  }
+};

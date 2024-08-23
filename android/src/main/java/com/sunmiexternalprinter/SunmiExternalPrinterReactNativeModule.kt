@@ -1,6 +1,7 @@
 package com.sunmiexternalprinter
 
 import android.annotation.SuppressLint
+import android.app.ActivityManager
 import android.bluetooth.BluetoothAdapter
 import android.bluetooth.BluetoothDevice
 import android.bluetooth.BluetoothManager
@@ -27,6 +28,7 @@ import com.facebook.react.bridge.ReactApplicationContext
 import com.facebook.react.bridge.ReactContext
 import com.facebook.react.bridge.ReactContextBaseJavaModule
 import com.facebook.react.bridge.ReactMethod
+import com.facebook.react.bridge.WritableArray
 import com.facebook.react.bridge.WritableMap
 import com.facebook.react.modules.core.DeviceEventManagerModule
 import com.github.anastaciocintra.escpos.EscPos
@@ -338,6 +340,7 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
       intent.setAction(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS)
       intent.setData(Uri.parse("package:$packageName"));
+      intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
     };
     reactApplicationContext.startActivity(intent)
   }
@@ -573,6 +576,29 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
       }
     }.start()
 
+  }
+  @Suppress("DEPRECATION")
+  @ReactMethod
+  fun isServiceRunning(promise:Promise) {
+    val activityManager = reactApplicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
+      println("This is service name ${service.service.className}")
+      if ("com.asterinet.react.bgactions.RNBackgroundActionsTask" == service.service.className) {
+        promise.resolve(true)
+      }
+    }
+    promise.resolve(false)
+  }
+
+  @Suppress("DEPRECATION")
+  @ReactMethod
+  fun getListofServiceNames(promise:Promise) {
+    val activityManager = reactApplicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    val services:WritableArray= Arguments.createArray()
+    for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
+      services.pushString(service.service.className)
+    }
+    promise.resolve(services)
   }
 
 
