@@ -179,3 +179,10 @@ export const getListofServiceNames = async () => {
     throw error;
   }
 };
+export const stopRunningService = async () => {
+  try {
+    return await SunmiExternalPrinterReactNative.stopRunningService();
+  } catch (error) {
+    throw error;
+  }
+};

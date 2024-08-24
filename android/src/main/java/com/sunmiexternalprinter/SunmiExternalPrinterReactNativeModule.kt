@@ -592,6 +592,23 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
 
   @Suppress("DEPRECATION")
   @ReactMethod
+  fun stopRunningService(promise:Promise) {
+    val activityManager = reactApplicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
+    for (service in activityManager.getRunningServices(Int.MAX_VALUE)) {
+      println("This is service name ${service.service.className}")
+      if ("com.asterinet.react.bgactions.RNBackgroundActionsTask" == service.service.className) {
+        val stopIntent = Intent().apply {
+          component = service.service
+        }
+        val result=reactApplicationContext.stopService(stopIntent)
+        promise.resolve(result)
+      }
+    }
+    promise.resolve(false)
+  }
+
+  @Suppress("DEPRECATION")
+  @ReactMethod
   fun getListofServiceNames(promise:Promise) {
     val activityManager = reactApplicationContext.getSystemService(Context.ACTIVITY_SERVICE) as ActivityManager
     val services:WritableArray= Arguments.createArray()
@@ -600,7 +617,6 @@ class SunmiExternalPrinterReactNativeModule(reactContext: ReactApplicationContex
     }
     promise.resolve(services)
   }
-
 
 
   companion object {
